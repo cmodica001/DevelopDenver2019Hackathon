@@ -20,6 +20,16 @@ app.get("*", (req, res) => {
   res.render("index");
 });
 
+// Handle the SMS comimn in
+app.post("/sms", (req, res) => {
+  console.log(req.body);
+});
+// Handle the SMS comimn in
+app.post("/status", (req, res) => {
+  console.log(req, res);
+  res.send();
+});
+
 // Listen on the portttt
 app.listen(port, () => {
   console.log(`Our app is running on port ${port}`);
