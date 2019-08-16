@@ -30,7 +30,6 @@ app.get("*", (req, res) => {
 
 // Handle the SMS comimn in
 app.post("/sms", (req, res) => {
-  console.log(req.body);
   const { Body: wordz } = req.body;
   if (wordz && wordz.length > 0) {
     const cleanMsg = removePunctuation(wordz);
