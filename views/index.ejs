@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- scrippzz here -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+
+  <body>
+    <div id="app">
+      <marquee
+        ><h1>
+          TEXT 720-897-0049 to let us know your favorite things about DVLP
+          Denver!
+        </h1></marquee
+      >
+      <marquee id="wordList"></marquee>
+    </div>
+  </body>
+
+  <script type="text/javascript">
+    const socket = io("http://localhost:1337");
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+      //do work
+      socket.on("connection", socket => {
+        let token = socket.handshake.query.token;
+        console.log("we connected babieszzz");
+      });
+
+      socket.on("wordz", evt => {
+        console.log("dis da worzzzz", evt);
+        document.querySelector("#wordList").append(evt);
+      });
+    });
+  </script>
+  <script src="../app.js"></script>
+</html>
