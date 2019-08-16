@@ -4,6 +4,7 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const bodyParser = require("body-parser");
+const io = require("socket.io")(1337);
 
 // support parsing of application/json type post data
 app.use(bodyParser.json());
@@ -30,6 +31,8 @@ app.get("*", (req, res) => {
 // Handle the SMS comimn in
 app.post("/sms", (req, res) => {
   console.log(req.body);
+  const { Body: wordz } = req.body;
+  io.emit("wordz", wordz);
 });
 // Handle the SMS comimn in
 app.post("/status", (req, res) => {
