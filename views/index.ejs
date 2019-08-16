@@ -14,7 +14,18 @@
           Denver!
         </h1></marquee
       >
-      <marquee id="wordList"></marquee>
+      <h2 style="text-align: center">
+        Scrolling purple text iz hard to read so
+      </h2>
+      <h3 style="text-align: center">Please text 720-897-0049</h3>
+
+      <div id="wordcloud">
+        <!-- Word cloud -->
+      </div>
+
+      <marquee id="wordList">
+        <!-- Full length messagez go herez-->
+      </marquee>
     </div>
   </body>
 
@@ -23,16 +34,30 @@
 
     document.addEventListener("DOMContentLoaded", function(event) {
       //do work
-      socket.on("connection", socket => {
-        let token = socket.handshake.query.token;
-        console.log("we connected babieszzz");
-      });
+      // socket.on("connection", socket => {
+      //   let token = socket.handshake.query.token;
+      //   console.log("we connected babieszzz");
+      // });
 
-      socket.on("wordz", evt => {
-        console.log("dis da worzzzz", evt);
-        document.querySelector("#wordList").append(evt);
+      socket.on("wordz", message => {
+        console.log("dis da worzzzz", message);
+        // create a new div element
+        const newSpan = document.createElement("span");
+        // and give it some content
+        const newContent = document.createTextNode(message);
+        // add the text node to the newly created div
+        newSpan.appendChild(newContent);
+
+        document.querySelector("#wordList").append(newSpan);
       });
     });
+
+    document.querySelector("#dumpCSV").addEventListener("click", {});
   </script>
   <script src="../app.js"></script>
+  <style>
+    #wordList span {
+      margin-right: 16px;
+    }
+  </style>
 </html>
