@@ -2,6 +2,9 @@
 <html>
   <head>
     <!-- scrippzz here -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <!-- <script src="d3.layout.cloud.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
     <link rel="stylesheet" href="../styles.css" />
   </head>
@@ -10,36 +13,42 @@
     <div id="app">
       <marquee
         ><h1>
-          TEXT 720-897-0049 to let us know your favorite things about DVLP
-          Denver!
+          TEXT 720-897-0049 to share your favorite things about DVLP Denver!
         </h1></marquee
       >
       <h2 style="text-align: center">
         Scrolling purple text iz hard to read so
       </h2>
-      <h3 style="text-align: center">Please text 720-897-0049</h3>
+      <h3 style="text-align: center">
+        Please text 720-897-0049 to share your favorite things about DVLP Denver
+        :)
+      </h3>
 
-      <div id="wordcloud">
+      <div class="wordcloud">
         <!-- Word cloud -->
       </div>
 
-      <marquee id="wordList">
+      <marquee id="fullLength">
         <!-- Full length messagez go herez-->
       </marquee>
     </div>
   </body>
 
   <script type="text/javascript">
+    let processedWordCloud = {};
     const socket = io("http://localhost:1337");
 
     document.addEventListener("DOMContentLoaded", function(event) {
-      //do work
-      // socket.on("connection", socket => {
-      //   let token = socket.handshake.query.token;
-      //   console.log("we connected babieszzz");
-      // });
+      let words = [];
 
       socket.on("wordz", message => {
+        console.log(message);
+        words = words.concat(message);
+        console.log(words, message);
+        render(parseAllWords(words));
+      });
+
+      socket.on("fullLength", message => {
         console.log("dis da worzzzz", message);
         // create a new div element
         const newSpan = document.createElement("span");
@@ -48,16 +57,141 @@
         // add the text node to the newly created div
         newSpan.appendChild(newContent);
 
-        document.querySelector("#wordList").append(newSpan);
+        document.querySelector("#fullLength").append(newSpan);
       });
     });
 
+    function parseAllWords(data) {
+      const final = [];
+      let data_value = null;
+      for (var i = 0; i <= data.length; i++) {
+        if (data[i] != data_value) {
+          if (cnt > 0) {
+            final.push({ text: data_value, size: cnt * 5 });
+          }
+          data_value = data[i];
+          cnt = 1;
+        } else {
+          cnt++;
+        }
+      }
+
+      return final;
+    }
+
+    var color = d3.scale
+      .linear()
+      .domain([0, 1, 2, 3, 4, 5, 6, 10, 15, 20, 100])
+      .range([
+        "#ddd",
+        "#ccc",
+        "#bbb",
+        "#aaa",
+        "#999",
+        "#888",
+        "#777",
+        "#666",
+        "#555",
+        "#444",
+        "#333",
+        "#222"
+      ]);
+
+    const parseText = text => {
+      const stuff = text.split(" ").reduce((word, cloud) => {
+        console.log(word, cloud);
+        const lowerCased = word.toLowerCase();
+        if (!cloud[toLowerCased]) {
+          cloud[toLowerCased] = {
+            text: toLowerCased,
+            size: 0
+          };
+        } else {
+        }
+        console.log(cloud[toLowerCased]);
+        cloud[toLowerCased].size += 5;
+
+        return cloud;
+      }, processedWordCloud);
+    };
+
+    function render(words) {
+      d3.select("svg").remove();
+
+      d3.layout
+        .cloud()
+        .size([800, 300])
+        .words(words)
+        .rotate(0)
+        .fontSize(function(d) {
+          return d.size;
+        })
+        .on("end", draw)
+        .start();
+
+      function draw(words) {
+        d3.select(".wordcloud")
+          .append("svg")
+          .attr("width", 850)
+          .attr("height", 350)
+          .attr("class", "wordcloud")
+          .append("g")
+          // without the transform, words words would get cutoff to the left and top, they would
+          // appear outside of the SVG area
+          .attr("transform", "translate(320,200)")
+          .selectAll("text")
+          .data(words)
+          .enter()
+          .append("text")
+          .style("font-size", function(d) {
+            return d.size + "px";
+          })
+          .style("fill", function(d, i) {
+            return color(i);
+          })
+          .attr("transform", function(d) {
+            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+          })
+          .text(function(d) {
+            return d.text;
+          });
+      }
+    }
+
     document.querySelector("#dumpCSV").addEventListener("click", {});
+    let unique = [...new Set(data.map(item => item))];
+    let final = [];
+    data.sort();
+    var data_value = null;
+    var cnt = 0;
+    for (var i = 0; i <= data.length; i++) {
+      if (data[i] != data_value) {
+        if (cnt > 0) {
+          final.push({ text: data_value, size: cnt * 5 });
+        }
+        data_value = data[i];
+        cnt = 1;
+      } else {
+        cnt++;
+      }
+    }
+    const dumb = [...final];
+
+    console.log("frequeunzy");
+    console.log([...frequency_list]);
   </script>
-  <script src="../app.js"></script>
   <style>
-    #wordList span {
+    #fullLength span {
       margin-right: 16px;
+    }
+
+    #fullLength span:nth-child(2n) {
+      color: goldenrod;
+      color: #fff !important;
+    }
+
+    .wordcloud svg text {
+      font-size: 96px !important;
     }
   </style>
 </html>
